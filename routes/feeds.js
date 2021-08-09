@@ -1,6 +1,6 @@
 var express = require('express')
 var router = express.Router()
-const { readApiJSON, writeApiJSON } = require('../common')
+const { readApiJSON, writeApiJSON, success } = require('../common')
 
 const readFeeds = () => readApiJSON('./feeds.json')
 const writeFeeds = () => writeApiJSON('./feeds.json', feedsData)
@@ -8,10 +8,7 @@ const feedsData = readFeeds()
 const feeds = feedsData.data
 
 router.get('/count', (req, res) => {
-  const ret = {
-    data: {count: feeds.length}
-  }
-  res.json(ret)
+  success(res, {count: feeds.length})
 })
 
 router.get('/', (req, res) => {
@@ -20,10 +17,10 @@ router.get('/', (req, res) => {
   const ret = {
     data: {feeds: feeds.slice(page * pageSize, (page + 1) * pageSize),}
   }
-  res.json(ret)
+  success(res, ret)
 })
 
-router.update('/:id/hot', (req, res) => {
+router.put('/:id/hot', (req, res) => {
   const id = parseInt(req.params.id)
   const feed = feeds.find((f) => f.id === id)
   if (feed) {
@@ -31,7 +28,7 @@ router.update('/:id/hot', (req, res) => {
     writeFeeds()
   }
   const ret = { feed }
-  res.json(ret)
+  success(res, feed)
 })
 
 module.exports = router

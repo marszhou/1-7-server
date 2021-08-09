@@ -12,5 +12,6 @@ const writeApiJSON = (path, data) => {
     flag: 'w',
   })
 }
+const success = (res, data) => res.json({data})
 
-module.exports = { jsonPath, readApiJSON, writeApiJSON }
+module.exports = { jsonPath, readApiJSON, writeApiJSON, success }
