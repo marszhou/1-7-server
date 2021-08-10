@@ -8,7 +8,7 @@ const feedsData = readFeeds()
 const feeds = feedsData.data
 
 router.get('/count', (req, res) => {
-  success(res, {count: feeds.length})
+  success(res, { count: feeds.length })
 })
 
 router.get('/', (req, res) => {
@@ -16,11 +16,9 @@ router.get('/', (req, res) => {
   page = parseInt(page) > 0 ? parseInt(page) : 1
   const pageSize = 10
   const ret = {
-    data: {
-      feeds: feeds.slice(page * pageSize, (page + 1) * pageSize),
-      count: feeds.length,
-      page
-    }
+    feeds: feeds.slice(page * pageSize, (page + 1) * pageSize),
+    count: feeds.length,
+    page,
   }
   success(res, ret)
 })
