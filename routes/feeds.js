@@ -12,10 +12,15 @@ router.get('/count', (req, res) => {
 })
 
 router.get('/', (req, res) => {
-  const { page = 1 } = req.query
+  let { page } = req.query
+  page = parseInt(page) > 0 ? parseInt(page) : 1
   const pageSize = 10
   const ret = {
-    data: {feeds: feeds.slice(page * pageSize, (page + 1) * pageSize),}
+    data: {
+      feeds: feeds.slice(page * pageSize, (page + 1) * pageSize),
+      count: feeds.length,
+      page
+    }
   }
   success(res, ret)
 })
