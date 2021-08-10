@@ -4,11 +4,13 @@ var path = require('path')
 var cookieParser = require('cookie-parser')
 var logger = require('morgan')
 var cors = require('cors')
+var session = require('express-session')
 
 var indexRouter = require('./routes/index')
 var feedsRouter = require('./routes/feeds')
 var top10Router = require('./routes/top10')
 var usersRouter = require('./routes/users')
+var captchaRouter = require('./routes/captcha')
 
 var app = express()
 
@@ -22,11 +24,13 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(session({ secret: 'keyboard cat'}))
 
 app.use('/', indexRouter)
 app.use('/feeds', feedsRouter)
 app.use('/top10', top10Router)
 app.use('/users', usersRouter)
+app.use('/captcha', captchaRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
