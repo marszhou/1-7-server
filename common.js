@@ -7,11 +7,19 @@ const readApiJSON = (path) => {
   return JSON.parse(data)
 }
 const writeApiJSON = (path, data) => {
-  fs.writeFileSync(process.cwd() + '/fake-api/'+path, JSON.stringify(data), {
+  fs.writeFileSync(process.cwd() + '/fake-api/' + path, JSON.stringify(data), {
     encoding: 'UTF-8',
     flag: 'w',
   })
 }
-const success = (res, data) => res.json({data, ok: true})
+const success = (res, data) => res.json({ data, ok: true })
+const error = (res, error) => res.json({ error, ok: false })
 
-module.exports = { jsonPath, readApiJSON, writeApiJSON, success }
+const testCaptcha = (captcha, text) => {
+  const expires = 100000
+  if (!captcha) return false
+  if (Date.now() - captcha.ts > expires) return false
+  return captcha.text.toUpperCase() === text.toUpperCase()
+}
+
+module.exports = { jsonPath, readApiJSON, writeApiJSON, success, testCaptcha, error }
