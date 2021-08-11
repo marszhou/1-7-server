@@ -7,7 +7,6 @@ const { success, testCaptcha, error } = require('../common')
 router.get('/', function (req, res) {
 	var captcha = svgCaptcha.create();
 	req.session.captcha = {ts: Date.now(), text:captcha.text};
-  // console.log(captcha.text)
 	res.type('svg');
 	res.status(200).send(captcha.data);
 });
