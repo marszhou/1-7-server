@@ -22,4 +22,8 @@ const testCaptcha = (captcha, text) => {
   return captcha.text.toUpperCase() === text.toUpperCase()
 }
 
-module.exports = { jsonPath, readApiJSON, writeApiJSON, success, testCaptcha, error }
+const randomKey = (len = 4) => {
+  return Math.random().toString(36).substr(-4)
+}
+
+module.exports = { jsonPath, readApiJSON, writeApiJSON, success, testCaptcha, error , randomKey}

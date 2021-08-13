@@ -12,7 +12,6 @@ router.get('/', function (req, res) {
 });
 
 router.get('/test', (req, res) => {
-  console.log(req.session.captcha)
   const i = req.url.indexOf('?')
   const queryString = req.url.substr(i+1);
   const captcha = req.session.captcha

@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
   page = parseInt(page) > 0 ? parseInt(page) : 1
   const pageSize = 10
   const ret = {
-    feeds: feeds.slice(page * pageSize, (page + 1) * pageSize),
+    feeds: feeds.slice((page-1) * pageSize, page * pageSize),
     count: feeds.length,
     page,
   }

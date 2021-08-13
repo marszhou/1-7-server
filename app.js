@@ -11,6 +11,7 @@ var feedsRouter = require('./routes/feeds')
 var top10Router = require('./routes/top10')
 var usersRouter = require('./routes/users')
 var captchaRouter = require('./routes/captcha')
+var accountRouter = require('./routes/account')
 
 var app = express()
 
@@ -31,6 +32,7 @@ app.use('/feeds', feedsRouter)
 app.use('/top10', top10Router)
 app.use('/users', usersRouter)
 app.use('/captcha', captchaRouter)
+app.use('/account', accountRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
