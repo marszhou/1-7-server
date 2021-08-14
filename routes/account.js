@@ -1,5 +1,5 @@
 var express = require('express')
-const { testSignin, signUp } = require('../account')
+const { testSignin, signUp, createSession, removeSession } = require('../account')
 const { readApiJSON, error, randomKey, success, testCaptcha, writeApiJSON } = require('../common')
 const { testPhoneFormat, testPhoneExists, testPasswordFormat, testNicknameFormat, testNicknameExists, testSmsCode } = require('../verify')
 var router = express.Router()
@@ -50,16 +50,28 @@ router.post('/signUp', function (req, res, next) {
       const account = signUp({phone, passwd, nickname})
       accounts.data.push(account)
       writeApiJSON('./accounts.json', accounts)
-      success(res, accounts.data)
+      success(res)
     }
   }
 })
 
 router.post('/signIn', function (req, res, next) {
-  const { phone = '', passwd = '' } = req.query
-  const account = testSignin(phone, passwd)
+  const { phone = '', passwd = '' } = req.body
+  const account = testSignin(accounts.data, phone, passwd)
+  // console.log('&&&&', account)
   if (account !== undefined) {
-    // create session
+    sessions.data = removeSession(sessions.data, account)
+    // console.log('$$$$', account)
+    let session = createSession(account)
+    sessions.data.push(session)
+    writeApiJSON('./sessions.json', sessions)
+    success(res, {
+      uid: account.id,
+      nickname: account.nickname,
+      token: session.token
+    })
+  } else {
+    error(res, {message: '用户不存在，或错误的手机号码或密码。'})
   }
 })
 
