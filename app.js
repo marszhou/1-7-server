@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser')
 var logger = require('morgan')
 var cors = require('cors')
 var session = require('express-session')
+var fileupload = require('express-fileupload')
 
 var indexRouter = require('./routes/index')
 var feedsRouter = require('./routes/feeds')
@@ -13,6 +14,7 @@ var usersRouter = require('./routes/users')
 var captchaRouter = require('./routes/captcha')
 var accountRouter = require('./routes/account')
 const { middleware_authorization } = require('./account')
+
 
 var app = express()
 
@@ -27,6 +29,9 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(session({ secret: 'keyboard cat'}))
+app.use(fileupload({
+  limits: { fileSize: 50 * 1024 * 1024 },
+}));
 app.use(middleware_authorization)
 
 app.use('/', indexRouter)
