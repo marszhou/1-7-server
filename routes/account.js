@@ -1,11 +1,12 @@
 var express = require('express')
-const { testSignin, signUp, createSession, removeSession } = require('../account')
+const { testSignin, signUp, createSession, removeSession, getAccountData, getSessionData } = require('../account')
+const app = require('../app')
 const { readApiJSON, error, randomKey, success, testCaptcha, writeApiJSON } = require('../common')
 const { testPhoneFormat, testPhoneExists, testPasswordFormat, testNicknameFormat, testNicknameExists, testSmsCode } = require('../verify')
 var router = express.Router()
 
-const accounts = readApiJSON('./accounts.json')
-const sessions = readApiJSON('./sessions.json')
+const accounts = getAccountData()
+const sessions = getSessionData()
 
 /* GET users listing. */
 router.post('/signUp', function (req, res, next) {
@@ -90,14 +91,5 @@ router.get('/sendSms', function (req, res) {
     error(res, {message: '非法请求。'})
   }
 })
-
-// router.get('/a', function(req, res) {
-//   req.session.a = '123'
-//   success(res, null)
-// })
-
-// router.get('/b', function(req, res) {
-//   success(res, req.session.a)
-// })
 
 module.exports = router

@@ -12,6 +12,7 @@ var top10Router = require('./routes/top10')
 var usersRouter = require('./routes/users')
 var captchaRouter = require('./routes/captcha')
 var accountRouter = require('./routes/account')
+const { middleware_authorization } = require('./account')
 
 var app = express()
 
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(session({ secret: 'keyboard cat'}))
+app.use(middleware_authorization)
 
 app.use('/', indexRouter)
 app.use('/feeds', feedsRouter)
