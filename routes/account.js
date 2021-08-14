@@ -1,8 +1,27 @@
 var express = require('express')
-const { testSignin, signUp, createSession, removeSession, getAccountData, getSessionData } = require('../account')
+const {
+  testSignin,
+  signUp,
+  createSession,
+  removeSession,
+  getAccountData,
+  getSessionData,
+  getAccountFromSession,
+  refreshSessions,
+} = require('../account')
 const app = require('../app')
 const { readApiJSON, error, randomKey, success, testCaptcha, writeApiJSON } = require('../common')
-const { testPhoneFormat, testPhoneExists, testPasswordFormat, testNicknameFormat, testNicknameExists, testSmsCode } = require('../verify')
+const {
+  testPhoneFormat,
+  testPhoneExists,
+  testPasswordFormat,
+  testNicknameFormat,
+  testNicknameExists,
+  testSmsCode,
+} = require('../verify')
+const fs = require('fs')
+const imageThumbnail = require('image-thumbnail')
+
 var router = express.Router()
 
 const accounts = getAccountData()
@@ -28,15 +47,15 @@ router.post('/signUp', function (req, res, next) {
   if (passwd.length === 0) {
     err.passwd = { message: '请填写密码。' }
   } else if (!testPasswordFormat(passwd)) {
-    err.passwd = { message: '密码最少6位，包括至少1个大写字母，1个小写字母，1个数字，1个特殊字符'}
+    err.passwd = { message: '密码最少6位，包括至少1个大写字母，1个小写字母，1个数字，1个特殊字符' }
   }
 
   if (nickname.length === 0) {
     err.nickname = { message: '请填写昵称。' }
   } else if (!testNicknameFormat(nickname)) {
-    err.nickname = { message: '用户名由字母数字下划线和汉字组成，长度大于等于4小于等于16（汉字宽度按2计算）'}
+    err.nickname = { message: '用户名由字母数字下划线和汉字组成，长度大于等于4小于等于16（汉字宽度按2计算）' }
   } else if (testNicknameExists(accounts.data, nickname)) {
-    err.nickname = { message: '该昵称已经有其他人使用。'}
+    err.nickname = { message: '该昵称已经有其他人使用。' }
   }
   // console.log(req.session.smsCode)
   if (Object.keys(err).length > 0) {
@@ -46,9 +65,9 @@ router.post('/signUp', function (req, res, next) {
     // remove session
     // req.session.smsCode = null
     if (!flag) {
-      error(res, {smsCode: {message: '验证码错误，重新请求。'}})
-    } else{
-      const account = signUp({phone, passwd, nickname})
+      error(res, { smsCode: { message: '验证码错误，重新请求。' } })
+    } else {
+      const account = signUp({ phone, passwd, nickname })
       accounts.data.push(account)
       writeApiJSON('./accounts.json', accounts)
       success(res)
@@ -68,11 +87,13 @@ router.post('/signIn', function (req, res, next) {
     writeApiJSON('./sessions.json', sessions)
     success(res, {
       uid: account.id,
+      phone: account.phone,
       nickname: account.nickname,
-      token: session.token
+      avatar: account.avatar || {},
+      token: session.token,
     })
   } else {
-    error(res, {message: '用户不存在，或错误的手机号码或密码。'})
+    error(res, { message: '用户不存在，或错误的手机号码或密码。' })
   }
 })
 
@@ -80,15 +101,50 @@ router.get('/signOut', function (req, res) {})
 
 router.get('/sendSms', function (req, res) {
   const i = req.url.indexOf('?')
-  const queryString = req.url.substr(i+1);
+  const queryString = req.url.substr(i + 1)
   const captcha = req.session.captcha
   req.session.captcha = null
 
-  if(testCaptcha(captcha, queryString)) {
+  if (testCaptcha(captcha, queryString)) {
     req.session.smsCode = randomKey()
     success(res, req.session.smsCode)
   } else {
-    error(res, {message: '非法请求。'})
+    error(res, { message: '非法请求。' })
+  }
+})
+
+router.post('/avatar', async function (req, res) {
+  if (req.isAuthed) {
+    if(!(req.files && req.files.avatar)) {
+      error(res, {message: '没有上传文件。'})
+      return
+    }
+    const imgDir = fs.realpathSync(__dirname + '/../public/avatars/')
+    const account = getAccountFromSession(req.user.token)
+    const formats = {
+      lg: 512,
+      m: 128,
+      sm: 64,
+      xs: 32,
+    }
+    const avatar = {}
+    const postfix = randomKey(4)
+    for (let key in formats) {
+      const filename = `${account.id}@${formats[key]}-${postfix}.jpg`
+      const thumbnail = await imageThumbnail(req.files.avatar.tempFilePath, {
+        width: formats[key],
+        height: formats[key],
+        fit: 'cover',
+      })
+      fs.createWriteStream(imgDir+ '/' + filename).write(thumbnail)
+      avatar[key] = '/avatars/' + filename
+    }
+    account.avatar = avatar
+    writeApiJSON('./accounts.json', accounts)
+    refreshSessions(req, sessions, req.user.token)
+    success(res)
+  } else {
+    error(res, { message: '禁止访问' })
   }
 })
 

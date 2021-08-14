@@ -1,6 +1,6 @@
 const md5 = require('md5')
 const {v4} = require('uuid')
-const { readApiJSON } = require('./common')
+const { readApiJSON, writeApiJSON } = require('./common')
 const secret = 'TRUSTNO1'
 const accounts = readApiJSON('./accounts.json')
 const sessions = readApiJSON('./sessions.json')
@@ -19,6 +19,12 @@ function testSignin(accounts, phone, passwd) {
 function signUp(info) {
   info.passwd = passwdEncode(info.passwd)
   info.id = v4()
+  info.avatar = {
+    lg: '/avatars/avatar@512.png',
+    m: '/avatars/avatar@128.png',
+    sm: '/avatars/avatar@64.png',
+    xs: '/avatars/avatar@32.png',
+  }
   return info
 }
 
@@ -47,6 +53,24 @@ function removeSession(sessions, account) {
   return sessions.filter(session => session.id !== account.id)
 }
 
+function getAccountFromSession(token) {
+  const session = sessions.data.find(s => s.token)
+  if(session) {
+    return accounts.data.find(a => a.id === session.id)
+  }
+}
+
+function refreshSessions(req, sessions, token) {
+  const account = getAccountFromSession(token)
+  const copy = {... account}
+  delete copy.passwd
+  const index = sessions.data.findIndex(s => s.token === token)
+  Object.assign(sessions.data[index], copy)
+  writeApiJSON('./sessions.json', sessions)
+  req.user = sessions.data[index]
+  req.user
+}
+
 module.exports = {
-  passwdEncode, testSignin, signUp, createSession, removeSession, getAccountData, getSessionData, middleware_authorization
+  passwdEncode, testSignin, signUp, createSession, removeSession, getAccountData, getSessionData, middleware_authorization, getAccountFromSession, refreshSessions
 }
