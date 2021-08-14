@@ -15,7 +15,6 @@ var captchaRouter = require('./routes/captcha')
 var accountRouter = require('./routes/account')
 const { middleware_authorization } = require('./account')
 
-
 var app = express()
 
 // view engine setup
@@ -28,10 +27,14 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
-app.use(session({ secret: 'keyboard cat'}))
-app.use(fileupload({
-  limits: { fileSize: 50 * 1024 * 1024 },
-}));
+app.use(session({ secret: 'keyboard cat' }))
+app.use(
+  fileupload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+    useTempFiles: true,
+    tempFileDir: '/tmp/',
+  })
+)
 app.use(middleware_authorization)
 
 app.use('/', indexRouter)
