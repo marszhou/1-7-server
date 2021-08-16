@@ -27,6 +27,15 @@ var router = express.Router()
 const accounts = getAccountData()
 const sessions = getSessionData()
 
+router.all('/a', (req, res) => {
+  req.session.a = 1
+  res.json('aaa' +req.session.a )
+})
+
+router.all('/b', (req, res) => {
+  res.json('bbb'+req.session.a)
+})
+
 /* GET users listing. */
 router.post('/signUp', function (req, res, next) {
   let { phone = '', passwd = '', smsCode = '', nickname = '' } = req.body
@@ -55,15 +64,16 @@ router.post('/signUp', function (req, res, next) {
   } else if (!testNicknameFormat(nickname)) {
     err.nickname = { message: '用户名由字母数字下划线和汉字组成，长度大于等于4小于等于16（汉字宽度按2计算）' }
   } else if (testNicknameExists(accounts.data, nickname)) {
+    // console.log(1)
     err.nickname = { message: '该昵称已经有其他人使用。' }
   }
   // console.log(req.session.smsCode)
   if (Object.keys(err).length > 0) {
     error(res, err)
   } else {
-    const flag = testSmsCode(req.session, smsCode)
+    const flag = testSmsCode(req.session, smsCode) // || true
     // remove session
-    // req.session.smsCode = null
+    req.session.smsCode = null
     if (!flag) {
       error(res, { smsCode: { message: '验证码错误，重新请求。' } })
     } else {

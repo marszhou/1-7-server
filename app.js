@@ -21,13 +21,21 @@ var app = express()
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
 
-app.use(cors())
+app.use(
+  cors({
+    origin: ['http://127.0.0.1:5503', 'http://mytest.chouti.com:5503'],
+    // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    // preflightContinue: true,
+    // optionsSuccessStatus: 204,
+    credentials: true,
+  })
+)
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
-app.use(session({ secret: 'keyboard cat' }))
+app.use(session({ secret: 'keyboard cat', }))
 app.use(
   fileupload({
     limits: { fileSize: 50 * 1024 * 1024 },
@@ -49,11 +57,6 @@ app.use(function (req, res, next) {
   next(createError(404))
 })
 
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-  next()
-})
 
 // error handler
 app.use(function (err, req, res, next) {
