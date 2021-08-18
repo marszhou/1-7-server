@@ -88,7 +88,6 @@ router.post('/signUp', function (req, res, next) {
 router.post('/signIn', function (req, res, next) {
   const { phone = '', passwd = '' } = req.body
   const account = testSignin(accounts.data, phone, passwd)
-  // console.log('&&&&', account)
   if (account !== undefined) {
     sessions.data = removeSession(sessions.data, account)
     // console.log('$$$$', account)

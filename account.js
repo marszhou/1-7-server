@@ -54,7 +54,7 @@ function removeSession(sessions, account) {
 }
 
 function getAccountFromSession(token) {
-  const session = sessions.data.find(s => s.token)
+  const session = sessions.data.find(s => s.token === token)
   if(session) {
     return accounts.data.find(a => a.id === session.id)
   }

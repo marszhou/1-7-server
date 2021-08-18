@@ -40,7 +40,7 @@ app.use(
   fileupload({
     limits: { fileSize: 50 * 1024 * 1024 },
     useTempFiles: true,
-    tempFileDir: '/tmp/',
+    tempFileDir: process.platform === 'win32' ? 'c:\\Windows\\temp' : '/tmp/',
   })
 )
 app.use(middleware_authorization)
