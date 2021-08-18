@@ -41,8 +41,8 @@ function middleware_authorization(req, res, next) {
   if (token.length === 32) {
     const session = sessions.data.find(s => s.token === token)
     if (session) {
-      req.isAuthed = true
-      req.user = session
+      req._isAuthed = true
+      req._user = session
     }
   }
   next()
@@ -67,8 +67,7 @@ function refreshSessions(req, sessions, token) {
   const index = sessions.data.findIndex(s => s.token === token)
   Object.assign(sessions.data[index], copy)
   writeApiJSON('./sessions.json', sessions)
-  req.user = sessions.data[index]
-  req.user
+  req._user = sessions.data[index]
 }
 
 module.exports = {

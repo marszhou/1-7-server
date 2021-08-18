@@ -51,6 +51,7 @@ app.use('/top10', top10Router)
 app.use('/users', usersRouter)
 app.use('/captcha', captchaRouter)
 app.use('/account', accountRouter)
+app.use('/comments', require('./routes/comment'))
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -4,7 +4,7 @@ var fs = require('fs')
 const imageThumbnail = require('image-thumbnail');
 
 router.get('/', function (req, res, next) {
-  console.log(req.isAuthed, req.user)
+  console.log(req.isAuthed, req._user)
   res.render('index', { title: 'chouti server' })
 })
 

@@ -123,13 +123,13 @@ router.get('/sendSms', function (req, res) {
 })
 
 router.post('/avatar', async function (req, res) {
-  if (req.isAuthed) {
+  if (req._isAuthed) {
     if(!(req.files && req.files.avatar)) {
       error(res, {message: '没有上传文件。'})
       return
     }
     const imgDir = fs.realpathSync(__dirname + '/../public/avatars/')
-    const account = getAccountFromSession(req.user.token)
+    const account = getAccountFromSession(req._user.token)
     const formats = {
       lg: 512,
       m: 128,
@@ -150,7 +150,7 @@ router.post('/avatar', async function (req, res) {
     }
     account.avatar = avatar
     writeApiJSON('./accounts.json', accounts)
-    refreshSessions(req, sessions, req.user.token)
+    refreshSessions(req, sessions, req._user.token)
     success(res)
   } else {
     error(res, { message: '禁止访问' })

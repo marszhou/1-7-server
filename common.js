@@ -3,6 +3,9 @@ const fs = require('fs')
 const jsonPath = process.cwd() + '/fake-api/'
 const readApiJSON = (path) => {
   const filePath = jsonPath + path
+  if (!fs.existsSync(filePath)) {
+    return null
+  }
   const data = fs.readFileSync(filePath, { encoding: 'utf-8', flag: 'r' })
   return JSON.parse(data)
 }
