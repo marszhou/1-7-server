@@ -18,7 +18,7 @@ router.get('/:feedId', (req, res) => {
         find.children.push(comment)
       }
       return ret
-    })
+    }, [])
   }
 
   success(res, formatComments(comments.data))
