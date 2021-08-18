@@ -8,6 +8,7 @@ const {
   getSessionData,
   getAccountFromSession,
   refreshSessions,
+  clearSession,
 } = require('../account')
 const app = require('../app')
 const { readApiJSON, error, randomKey, success, testCaptcha, writeApiJSON } = require('../common')
@@ -106,7 +107,14 @@ router.post('/signIn', function (req, res, next) {
   }
 })
 
-router.get('/signOut', function (req, res) {})
+router.post('/signOut', function (req, res) {
+  if (req._isAuthed) {
+    clearSession(req, sessions, req._user.token)
+    success(res)
+    return
+  }
+  error(res)
+})
 
 router.get('/sendSms', function (req, res) {
   const i = req.url.indexOf('?')

@@ -70,6 +70,13 @@ function refreshSessions(req, sessions, token) {
   req._user = sessions.data[index]
 }
 
+function clearSession(req, sessions, token) {
+  sessions.data = sessions.data.filter(s => s.token !== token)
+  writeApiJSON('./sessions.json', sessions)
+  req._user = undefined
+  req._isAuthed = undefined
+}
+
 module.exports = {
-  passwdEncode, testSignin, signUp, createSession, removeSession, getAccountData, getSessionData, middleware_authorization, getAccountFromSession, refreshSessions
+  passwdEncode, testSignin, signUp, createSession, removeSession, clearSession, getAccountData, getSessionData, middleware_authorization, getAccountFromSession, refreshSessions
 }
