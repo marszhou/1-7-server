@@ -51,5 +51,4 @@ router.post('/:feedId', (req, res) => {
   success(res, comment)
 })
 
-
 module.exports = router
