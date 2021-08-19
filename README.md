@@ -9,6 +9,11 @@ cp init-data/* ./fake-api
 
 yarn
 yarn run dev
+
+或
+
+npm i
+npm start
 ```
 
 ## CORS
