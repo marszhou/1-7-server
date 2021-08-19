@@ -23,7 +23,7 @@ app.set('view engine', 'jade')
 
 app.use(
   cors({
-    origin: ['http://127.0.0.1:5503', 'http://mytest.chouti.com:5503'],
+    origin: ['http://127.0.0.1:5503', 'http://localhost:5503', 'http://mytest.chouti.com:5503'],
     // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     // preflightContinue: true,
     // optionsSuccessStatus: 204,
