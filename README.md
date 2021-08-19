@@ -72,6 +72,18 @@ axios.defaults.headers.common['authorization'] = `Bear ${user.token}`
 POST /account/signOut
 ```
 
+### 图片验证码
+
+```
+GET /account/captcha
+```
+
+### 模拟发送短信
+
+```
+GET /account/sendSms?{captcha}
+```
+
 ### 上传头像
 
 ```
