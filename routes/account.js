@@ -159,7 +159,7 @@ router.post('/avatar', async function (req, res) {
     account.avatar = avatar
     writeApiJSON('./accounts.json', accounts)
     refreshSessions(req, sessions, req._user.token)
-    success(res)
+    success(res, req._user)
   } else {
     error(res, { message: '禁止访问' })
   }
