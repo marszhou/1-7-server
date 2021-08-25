@@ -43,6 +43,9 @@ GET /top10/h72
 GET /top10/h168
 ```
 
+### 相关新闻
+GET /feeds/:id/related
+
 ### 注册
 
 ```
