@@ -5,6 +5,13 @@ const { readApiJSON, writeApiJSON, success, error } = require('../common')
 
 router.get('/:feedId', (req, res) => {
   let {feedId}= req.params
+
+  const feeds = readApiJSON('./feeds.json').data
+  if (feeds.findIndex(f=>f.id === parseInt(feedId)) === -1) {
+    error(res, {message: '没有这个feed。'})
+    return
+  }
+
   const file = `comments-${feedId}.json`
   const comments = readApiJSON(file) || {data: []}
 
@@ -29,9 +36,17 @@ router.post('/:feedId', (req, res) => {
     error(res, {message: '没有登录。'})
     return
   }
-
   let {parentId, content=''} = req.body
+  content = content.trim()
+
   let {feedId}= req.params
+
+  const feeds = readApiJSON('./feeds.json').data
+  if (feeds.findIndex(f=>f.id === parseInt(feedId)) === -1) {
+    error(res, {message: '没有这个feed。'})
+    return
+  }
+
   const file = `comments-${feedId}.json`
 
   if (content.length===0) {
@@ -39,9 +54,14 @@ router.post('/:feedId', (req, res) => {
     return
   }
   const comments = readApiJSON(file) || {data: []}
+  console.log(parentId, comments.data, comments.data.findIndex(c => c.id === parentId))
+  if (parentId && comments.data.findIndex(c => c.id === parentId) <0) {
+    error(res, {message: '该评论不存在'})
+    return
+  }
 
   const comment = {
-    user: req._user,
+    user: {id: req._user.id, nickname: req._user.nickname, avatar: req._user.avatar},
     id: v4(),
     parentId,
     content
