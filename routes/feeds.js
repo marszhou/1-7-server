@@ -34,4 +34,17 @@ router.put('/:id/hot', (req, res) => {
   success(res, feed)
 })
 
+router.get('/:id/related', (req, res) => {
+  const id = parseInt(req.params.id)
+  const len = (id+'').split('').reduce((a, x)=> +x+a, 0)%5
+  let i = (feeds.findIndex(f => f.id === id) + 100) % feeds.length
+  const ret = []
+  while(true) {
+    if(ret.length >= len) break
+    ret.push(feeds[i])
+    i = (i+1) % feeds.length
+  }
+  success(res, ret)
+})
+
 module.exports = router
