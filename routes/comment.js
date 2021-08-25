@@ -54,7 +54,6 @@ router.post('/:feedId', (req, res) => {
     return
   }
   const comments = readApiJSON(file) || {data: []}
-  console.log(parentId, comments.data, comments.data.findIndex(c => c.id === parentId))
   if (parentId && comments.data.findIndex(c => c.id === parentId) <0) {
     error(res, {message: '该评论不存在'})
     return
