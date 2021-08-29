@@ -13,6 +13,7 @@ var top10Router = require('./routes/top10')
 var usersRouter = require('./routes/users')
 var captchaRouter = require('./routes/captcha')
 var accountRouter = require('./routes/account')
+var favoriteRouter = require('./routes/favorite')
 const { middleware_authorization } = require('./account')
 
 var app = express()
@@ -52,6 +53,7 @@ app.use('/users', usersRouter)
 app.use('/captcha', captchaRouter)
 app.use('/account', accountRouter)
 app.use('/comments', require('./routes/comment'))
+app.use('/favorite', favoriteRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
