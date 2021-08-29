@@ -48,17 +48,6 @@ router.get('/', (req, res) => {
   success(res, ret)
 })
 
-router.put('/:id/hot', (req, res) => {
-  const id = parseInt(req.params.id)
-  const feed = feeds.find((f) => f.id === id)
-  if (feed) {
-    feed.ups += 1
-    writeFeeds()
-  }
-  const ret = { feed }
-  success(res, feed)
-})
-
 router.get('/:id/related', (req, res) => {
   const id = parseInt(req.params.id)
   const len = (id + '').split('').reduce((a, x) => +x + a, 0) % 5
@@ -91,10 +80,10 @@ router.post('/', (req, res) => {
     error(res, { message: '必须选择有效的话题' })
     return
   }
-  const newFeed = newFeed(title, imgUrl, originalUrl, topicId, topicName, req._user)
-  feeds.unshift(newFeed)
-  writeApiJSON('./feeds.json', feedsData)
-  success(res, newFeed)
+  const feed = newFeed(title, imgUrl, originalUrl, topicId, topicName, req._user)
+  feeds.unshift(feed)
+  writeFeeds()
+  success(res, feed)
 })
 
 router.put('/:id', (req, res) => {
@@ -135,7 +124,7 @@ router.put('/:id', (req, res) => {
     topicName,
   })
 
-  writeApiJSON('./feeds.json', feedsData)
+  writeFeeds()
   success(res, feed)
 })
 
@@ -159,7 +148,7 @@ router.delete('/:id', (req, res) => {
 
   feeds.splice(feedIndex, 1)
 
-  writeApiJSON('./feeds.json', feedsData)
+  writeFeeds()
   success(res)
 })
 
