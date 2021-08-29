@@ -1,6 +1,8 @@
 var express = require('express')
 var router = express.Router()
-const { readApiJSON, writeApiJSON, success } = require('../common')
+var fs = require('fs')
+var { v4 } = require('uuid')
+const { readApiJSON, writeApiJSON, success, error } = require('../common')
 
 const readFeeds = () => readApiJSON('./feeds.json')
 const writeFeeds = () => writeApiJSON('./feeds.json', feedsData)
@@ -12,6 +14,7 @@ const nextId = () => {
 const topics = () => {
   return feeds.reduce((topics, feed) => {
     topics[feed.topicId] = feed.topicName
+    return topics
   }, {})
 }
 const newFeed = (title, imgUrl, originalUrl, topicId, topicName, user) => {
@@ -66,20 +69,40 @@ router.post('/', (req, res) => {
     error(res, { message: '没有登录。' })
     return
   }
-  let { imgUrl, title, originalUrl, topicId } = req.body
-  imgUrl = imgUrl.trim()
+  let { title, originalUrl, topicId } = req.body
   title = title.trim()
   originalUrl = originalUrl.trim()
   topicId = parseInt(topicId) || 0
+  console.log(topics())
   let topicName = topics()[topicId]
-  if (!(title && imgUrl)) {
-    error(res, { message: '标题和图片必须填写' })
+  if (!(title)) {
+    error(res, { message: '标题必须填写' })
     return
   }
   if (!topicName) {
     error(res, { message: '必须选择有效的话题' })
     return
   }
+
+  const file = (req.files || {}).img
+  let imgUrl = ''
+  try {
+    fs.mkdirSync(__dirname + '/../public/avatars/uploads')
+  } catch {}
+
+  if (file) {
+    const ext = file.name.substr(file.name.lastIndexOf('.')).toLowerCase()
+    if (['.jpeg', '.jpg', '.webp', '.png', '.gif'].indexOf(ext) > -1) {
+      imgUrl = `/avatars/uploads/${v4()}${ext}`
+      file.mv(__dirname + '/../public' + imgUrl)
+    }
+  }
+  imgUrl = imgUrl.trim()
+  if (!imgUrl) {
+    error(res, { message: '图片必须填写。' })
+    return
+  }
+
   const feed = newFeed(title, imgUrl, originalUrl, topicId, topicName, req._user)
   feeds.unshift(feed)
   writeFeeds()
@@ -92,30 +115,46 @@ router.put('/:id', (req, res) => {
     return
   }
   let id = parseInt(req.params.id)
+
   let feed = feeds.find((f) => f.id === id)
   if (!feed) {
     error(res, { message: '不存在此feed。' })
     return
   }
-  if (feed.user.id !== req._user.id) {
+  if (feed.submittedUser.id !== req._user.id) {
     error(res, { message: '无权操作此feed。' })
     return
   }
 
-  let { imgUrl, title, originalUrl, topicId } = req.body
-  imgUrl = imgUrl.trim()
+  let { title, originalUrl, topicId } = req.body
   title = title.trim()
   originalUrl = originalUrl.trim()
   topicId = parseInt(topicId) || 0
   let topicName = topics()[topicId]
-  if (!(title && imgUrl)) {
-    error(res, { message: '标题和图片必须填写' })
+  if (!(title)) {
+    error(res, { message: '标题必须填写' })
     return
   }
   if (!topicName) {
     error(res, { message: '必须选择有效的话题' })
     return
   }
+
+  const file = (req.files || {}).img
+  let imgUrl = ''
+  try {
+    fs.mkdirSync(__dirname + '/../public/avatars/uploads')
+  } catch {}
+
+  if (file) {
+    const ext = file.name.substr(file.name.lastIndexOf('.')).toLowerCase()
+    if (['.jpeg', '.jpg', '.webp', '.png', '.gif'].indexOf(ext) > -1) {
+      imgUrl = `/avatars/uploads/${v4()}${ext}`
+      file.mv(__dirname + '/../public' + imgUrl)
+    }
+  }
+  imgUrl = imgUrl.trim() || feed.imgUrl
+
   Object.assign(feed, {
     title,
     originalUrl,
