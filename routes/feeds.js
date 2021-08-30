@@ -191,4 +191,14 @@ router.delete('/:id', (req, res) => {
   success(res)
 })
 
+router.get('/:id', (req, res)=> {
+  const id= parseInt(req.params.id)
+  const feed = feeds.find(feed => feed.id === id)
+  if (feed) {
+    success(res, feed)
+  } else {
+    error(res, {message: 'feed 不存在。'})
+  }
+})
+
 module.exports = router
